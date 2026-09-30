@@ -3,14 +3,13 @@ name: CI
 on:
   pull_request:
     branches: [develop, main]
-  push:
-    branches: [develop, main]
-  # Lets the deploy workflows run the same checks before deploying.
+  # The deploy workflows call this, so every deploy re-runs the exact same checks.
   workflow_call:
 
-# A new push to the same branch/PR cancels the run that's still going.
+# A new push to a PR cancels that PR's run that's still going.
+# Runs called from a deploy workflow get a unique group, so they are never cancelled.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 permissions:
@@ -96,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:18
         env:
           POSTGRES_USER: nightdrive
           POSTGRES_PASSWORD: nightdrive
