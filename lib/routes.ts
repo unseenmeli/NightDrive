@@ -70,3 +70,28 @@ export async function createPendingRoute(input: RouteInput, userId: number) {
 export async function listRoutesByUser(userId: number) {
   return db.select().from(routes).where(eq(routes.submittedBy, userId)).orderBy(desc(routes.createdAt));
 }
+
+export async function listAllRoutes() {
+  return db
+    .select({ route: routes, submitter: schema.users.email })
+    .from(routes)
+    .leftJoin(schema.users, eq(routes.submittedBy, schema.users.id))
+    .orderBy(desc(routes.createdAt));
+}
+
+export async function getRouteById(id: number) {
+  const [route] = await db.select().from(routes).where(eq(routes.id, id)).limit(1);
+  return route ?? null;
+}
+
+export async function setRouteStatus(id: number, status: "approved" | "rejected", rejectReason: string | null = null) {
+  await db.update(routes).set({ status, rejectReason, updatedAt: new Date() }).where(eq(routes.id, id));
+}
+
+export async function updateRoute(id: number, input: RouteInput) {
+  await db.update(routes).set({ ...input, updatedAt: new Date() }).where(eq(routes.id, id));
+}
+
+export async function deleteRoute(id: number) {
+  await db.delete(routes).where(eq(routes.id, id));
+}
