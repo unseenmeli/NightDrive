@@ -1,6 +1,6 @@
 # NightDrive: Project Notes & Handoff
 
-Last updated: 2026-09-30
+Last updated: 2026-09-30 (skeleton done)
 
 ## 1. What this project is
 
@@ -183,29 +183,29 @@ vercel.json          disable Git auto-deploy
 
 ## 5. Current state (where things stopped)
 
-- GitHub repo: **https://github.com/unseenmeli/NightDrive**
-- `main` pushed with one commit ("first commit": README.md + .gitignore)
-- `develop` created from `main` and pushed
-- Local branch checked out: **`feat/app-foundation`** (not pushed, nothing committed on it yet)
-- Uncommitted in working tree: `package.json`, `package-lock.json`, `node_modules/` (ignored)
-  - Installed: next@16, react@19, react-dom@19, drizzle-orm, postgres, @electric-sql/pglite,
-    leaflet, react-leaflet, zod; dev: typescript ~5.9, @types/*, tailwindcss v4 +
-    @tailwindcss/postcss, drizzle-kit, tsx, vitest, @playwright/test, eslint@9,
-    eslint-config-next@16, @eslint/eslintrc
-  - Scripts already defined: dev, build, start, lint, typecheck, test, test:e2e, db:generate,
-    db:check, db:migrate, db:seed, db:setup
-- **Stray folder `nightdrive/`**: an untouched `create-next-app` scaffold left over from an
-  interrupted attempt. It is useful as a reference for `tsconfig.json`, `eslint.config.mjs`,
-  `postcss.config.mjs`, `next.config.ts` and `app/` boilerplate. Copy what's needed to the root,
-  then delete the folder. **Do not commit it.**
+- GitHub repo: **https://github.com/unseenmeli/NightDrive**; `main` and `develop` pushed
+- Branch **`feat/app-foundation`** holds the working **skeleton** (plain HTML, no styling yet):
+  - Browse, search and filter routes; route details page (no map yet)
+  - Register / login / logout (scrypt + DB sessions); admin seeded from `ADMIN_EMAIL`/`ADMIN_PASSWORD`
+  - Submit a route (waypoints typed as `lat, lng` lines for now), profile with submission status
+  - Admin dashboard: approve, reject with reason, edit, delete
+  - Drizzle schema + first migration in `drizzle/`, idempotent seed with the 9 routes
+  - Vitest unit tests (`tests/unit`) and Playwright e2e (`tests/e2e`, read-only ones tagged `@smoke`)
+  - `.github/workflows/ci.yml`: lint, typecheck, unit, migrations check, build, e2e (Postgres 16 service)
+- Local commands: `cp .env.example .env && npm run db:setup && npm run dev`; `npm test`; `npm run test:e2e`
+  (e2e uses its own PGlite dir `.pglite-e2e/`); `BASE_URL=<url> npm run test:smoke` for a deployed site
+- `npm run typecheck` runs `next typegen` first (route types like `PageProps` are generated).
+- `next dev` writes `AGENTS.md`/`CLAUDE.md` into the repo root; they are gitignored.
+- The e2e flow against real Postgres has only been verified in CI, not locally (no Docker).
 - No Vercel project, Neon project, or GitHub Environments/secrets set up yet.
 
 ## 6. Next steps (in order)
 
-1. Move config from `nightdrive/` to root, delete `nightdrive/`, get `npm run dev` working
-2. Build the app: schema → migrations → seed → pages → auth → submit → admin
-3. Unit tests (filters, auth helpers, validation) + Playwright e2e and `@smoke` tests
-4. Add `.github/workflows/ci.yml`; open PR `feat/app-foundation` → `develop`; watch checks
+1. ~~Skeleton: config, schema → migrations → seed → pages → auth → submit → admin~~ (done)
+2. ~~Unit tests + Playwright e2e/`@smoke` tests + `ci.yml`~~ (done)
+3. Open PR `feat/app-foundation` → `develop`; get CI green
+4. Polish in small PRs: Leaflet maps (list, details, click-to-add waypoints on submit), route
+   shape SVG on cards, dark "night" theme with Tailwind, stops editor, featured toggle in admin
 5. Create Neon project with branches `main` (prod) and `staging`
 6. `vercel link`, add Vercel env vars (Production + Preview scoped to `develop`),
    add `vercel.json`, enable Protection Bypass for Automation
