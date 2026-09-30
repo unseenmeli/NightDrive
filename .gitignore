@@ -12,3 +12,7 @@ playwright-report/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# written by next dev for local tooling
+AGENTS.md
+CLAUDE.md
