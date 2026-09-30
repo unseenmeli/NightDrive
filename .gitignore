@@ -16,3 +16,4 @@ next-env.d.ts
 # written by next dev for local tooling
 AGENTS.md
 CLAUDE.md
+.pglite-e2e/
