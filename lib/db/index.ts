@@ -11,6 +11,10 @@ function createDb() {
   if (url) {
     return drizzlePostgres(postgres(url, { max: 5 }), { schema });
   }
+  if (process.env.VERCEL) {
+    // PGlite writes to local disk, which doesn't persist on Vercel. Fail loudly instead.
+    throw new Error("DATABASE_URL must be set on Vercel deployments");
+  }
   const client = new PGlite(process.env.PGLITE_DIR ?? ".pglite");
   return drizzlePglite(client, { schema }) as unknown as ReturnType<typeof drizzlePostgres<typeof schema>>;
 }
