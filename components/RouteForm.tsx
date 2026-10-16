@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import type { RouteFormState } from "@/app/actions/routes";
+import { WaypointEditor } from "./WaypointEditor";
 
 type Field = {
   name: string;
@@ -13,6 +14,7 @@ type Field = {
 
 const FIELDS: Field[] = [
   { name: "title", label: "Title", wide: true },
+  { name: "path", label: "Waypoints", hint: "Or type one \"lat, lng\" per line, at least 2", wide: true },
   { name: "startName", label: "Start" },
   { name: "endName", label: "End" },
   { name: "region", label: "Region" },
@@ -25,7 +27,6 @@ const FIELDS: Field[] = [
   { name: "bestTime", label: "Best time" },
   { name: "description", label: "Description", type: "textarea", wide: true },
   { name: "notes", label: "Notes", type: "textarea", wide: true },
-  { name: "path", label: "Waypoints", type: "textarea", hint: "One \"lat, lng\" per line, at least 2", wide: true },
 ];
 
 export function RouteForm({
@@ -47,8 +48,10 @@ export function RouteForm({
         return (
           <div key={field.name} className={`flex flex-col gap-1.5 ${field.wide ? "sm:col-span-2" : ""}`}>
             <label htmlFor={field.name}>{field.label}</label>
-            {field.type === "textarea" ? (
-              <textarea {...common} rows={field.name === "path" ? 6 : 3} />
+            {field.name === "path" ? (
+              <WaypointEditor id={common.id} name={common.name} defaultValue={common.defaultValue} />
+            ) : field.type === "textarea" ? (
+              <textarea {...common} rows={3} />
             ) : field.type === "select" ? (
               <select {...common}>
                 <option value="">Choose…</option>

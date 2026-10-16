@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { OverviewMap } from "@/components/map";
 import { RouteCard } from "@/components/RouteCard";
 import { DIFFICULTIES, parseFilters } from "@/lib/filters";
+import { cachedSnap } from "@/lib/roads";
 import { listApprovedRoutes, listRegions } from "@/lib/routes";
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const filters = parseFilters(await searchParams);
   const [routes, regions] = await Promise.all([listApprovedRoutes(filters), listRegions()]);
+  // Light road traces for the overview map and card shapes; falls back to the raw waypoints.
+  const lines = await Promise.all(routes.map(async (r) => (await cachedSnap(r.path, "simplified"))?.line ?? r.path));
 
   return (
     <main className="space-y-10">
@@ -69,6 +73,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           Routes
           <span className="font-mono text-sm text-neon not-italic">[{String(routes.length).padStart(2, "0")}]</span>
         </h2>
+        {routes.length > 0 && (
+          <div className="panel h-[360px] sm:h-[440px]">
+            <OverviewMap routes={routes.map((r, i) => ({ slug: r.slug, title: r.title, line: lines[i] }))} />
+          </div>
+        )}
         {routes.length === 0 ? (
           <div className="panel p-10 text-center">
             <p className="font-display text-sodium italic">Dead end.</p>
@@ -77,7 +86,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         ) : (
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {routes.map((route, i) => (
-              <RouteCard key={route.id} route={route} index={i} />
+              <RouteCard key={route.id} route={route} line={lines[i]} index={i} />
             ))}
           </ul>
         )}

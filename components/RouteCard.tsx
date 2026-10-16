@@ -1,13 +1,13 @@
 import Link from "next/link";
-import type { Route } from "@/lib/db/schema";
+import type { LatLng, Route } from "@/lib/db/schema";
 import { RouteShape } from "./RouteShape";
 import { StatBar } from "./StatBar";
 
-export function RouteCard({ route, index }: { route: Route; index: number }) {
+export function RouteCard({ route, line, index }: { route: Route; line: LatLng[]; index: number }) {
   return (
     <li className="group panel flex flex-col transition hover:-translate-y-0.5 hover:border-neon/60">
       <div className="relative border-b border-line/70 bg-asphalt/60">
-        <RouteShape path={route.path} className="aspect-[16/9] w-full" />
+        <RouteShape path={line} className="aspect-[16/9] w-full" />
         <span className="hud absolute top-2 left-3">R{String(index + 1).padStart(2, "0")}</span>
         {route.featured && (
           <span className="chip absolute top-2 right-3 border-sodium/50 bg-night/70 text-sodium">★ Featured</span>
