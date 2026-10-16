@@ -187,3 +187,98 @@
     filter: drop-shadow(0 0 3px var(--color-neon)) drop-shadow(0 0 10px rgb(62 240 255 / 0.6));
   }
 }
+
+/* ---------- Leaflet maps ----------
+   Unlayered and doubled-up selectors so these win over leaflet.css, which loads later with the map. */
+
+.leaflet-container.leaflet-container {
+  background: var(--color-night);
+  font-family: var(--font-mono);
+}
+
+/* Tint the grey tiles towards midnight blue */
+.leaflet-container .leaflet-tile-pane {
+  filter: brightness(0.6) sepia(0.6) hue-rotate(190deg) saturate(2.4) contrast(1.2);
+}
+
+.leaflet-container .leaflet-control-zoom {
+  border: 1px solid var(--color-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+.leaflet-container .leaflet-control-zoom a {
+  background: rgb(13 17 36 / 0.9);
+  color: var(--color-neon);
+  border-color: var(--color-line);
+  border-radius: 0;
+}
+.leaflet-container .leaflet-control-zoom a:hover {
+  background: var(--color-asphalt);
+  color: #fff;
+}
+
+.leaflet-container.leaflet-container .leaflet-control-attribution {
+  background: rgb(4 5 12 / 0.7);
+  color: var(--color-mist);
+  font-size: 0.6rem;
+}
+.leaflet-container.leaflet-container .leaflet-control-attribution a {
+  color: var(--color-mist);
+}
+
+.leaflet-container .leaflet-tooltip {
+  background: rgb(13 17 36 / 0.95);
+  color: #fff;
+  border: 1px solid rgb(62 240 255 / 0.5);
+  border-radius: 0;
+  box-shadow: 0 0 16px -4px var(--color-neon);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+.leaflet-container .leaflet-tooltip-top::before {
+  border-top-color: rgb(62 240 255 / 0.5);
+}
+
+.leaflet-container .leaflet-interactive {
+  cursor: pointer;
+}
+.nd-editor.leaflet-container {
+  cursor: crosshair;
+}
+
+.nd-marker {
+  background: none;
+  border: none;
+}
+.nd-marker span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.nd-start {
+  border: 3px solid var(--color-neon);
+  border-radius: 9999px;
+  background: var(--color-night);
+  box-shadow: 0 0 10px var(--color-neon);
+}
+.nd-end {
+  border-radius: 9999px;
+  background: var(--color-sodium);
+  box-shadow: 0 0 0 4px rgb(255 173 66 / 0.3), 0 0 16px var(--color-sodium);
+}
+.nd-stop {
+  transform: rotate(45deg);
+  background: var(--color-violet);
+  box-shadow: 0 0 10px var(--color-violet);
+}
+.nd-waypoint {
+  display: grid !important;
+  place-items: center;
+  border: 2px solid var(--color-neon);
+  background: var(--color-night);
+  color: var(--color-neon);
+  font: 600 0.65rem var(--font-mono);
+  box-shadow: 0 0 10px -2px var(--color-neon);
+  cursor: grab;
+}

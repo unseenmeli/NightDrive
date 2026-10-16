@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { LatLng, Stop } from "@/lib/db/schema";
+import type { LatLng } from "@/lib/db/schema";
 
 const W = 320;
 const H = 180;
@@ -34,17 +34,7 @@ function smoothPath(pts: (readonly [number, number])[]) {
   return d;
 }
 
-export function RouteShape({
-  path,
-  stops = [],
-  showStops = false,
-  className = "",
-}: {
-  path: LatLng[];
-  stops?: Stop[];
-  showStops?: boolean;
-  className?: string;
-}) {
+export function RouteShape({ path, className = "" }: { path: LatLng[]; className?: string }) {
   const id = useId().replace(/:/g, "");
   if (path.length < 2) return null;
 
@@ -76,19 +66,6 @@ export function RouteShape({
         strokeLinejoin="round"
         className="route-glow"
       />
-
-      {showStops &&
-        stops.map((stop) => {
-          const [x, y] = toXY(stop.lat, stop.lng);
-          return (
-            <g key={stop.name}>
-              <rect x={x - 4} y={y - 4} width="8" height="8" transform={`rotate(45 ${x} ${y})`} fill="var(--color-violet)" />
-              <text x={x + 9} y={y + 3} fill="#c9d2ee" fontSize="8" fontFamily="var(--font-mono)">
-                {stop.name}
-              </text>
-            </g>
-          );
-        })}
 
       <circle cx={start[0]} cy={start[1]} r="4.5" fill="var(--color-night)" stroke="var(--color-neon)" strokeWidth="2" />
       <circle cx={end[0]} cy={end[1]} r="9" fill="var(--color-sodium)" opacity="0.25">

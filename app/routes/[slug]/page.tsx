@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RouteShape } from "@/components/RouteShape";
+import { RouteMap } from "@/components/map";
 import { StatBar } from "@/components/StatBar";
 import type { StopType } from "@/lib/db/schema";
+import { cachedSnap } from "@/lib/roads";
 import { getApprovedRoute } from "@/lib/routes";
 
 const STOP_ICONS: Record<StopType, string> = { fuel: "F", cafe: "C", viewpoint: "◈", parking: "P" };
@@ -11,6 +12,7 @@ export default async function RoutePage({ params }: PageProps<"/routes/[slug]">)
   const { slug } = await params;
   const route = await getApprovedRoute(slug);
   if (!route) notFound();
+  const track = await cachedSnap(route.path);
 
   return (
     <main className="space-y-8">
@@ -28,9 +30,14 @@ export default async function RoutePage({ params }: PageProps<"/routes/[slug]">)
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="panel bg-asphalt/70">
-          <RouteShape path={route.path} stops={route.stops} showStops className="w-full" />
-          <p className="hud absolute bottom-3 left-4">Route trace · not to scale</p>
+        <div className="panel h-[420px] bg-asphalt/70 lg:h-auto lg:min-h-[480px]">
+          <RouteMap
+            waypoints={route.path}
+            track={track}
+            stops={route.stops}
+            startName={route.startName}
+            endName={route.endName}
+          />
         </div>
 
         <aside className="panel space-y-5 p-5">
