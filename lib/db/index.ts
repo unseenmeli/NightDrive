@@ -23,7 +23,19 @@ type Db = ReturnType<typeof createDb>;
 
 // Reuse one client across hot reloads in dev.
 const globalForDb = globalThis as unknown as { db?: Db };
-export const db: Db = globalForDb.db ?? createDb();
-if (process.env.NODE_ENV !== "production") globalForDb.db = db;
+
+function getDb(): Db {
+  globalForDb.db ??= createDb();
+  return globalForDb.db;
+}
+
+// The client is created on first query, not on import, so `next build` never needs a database.
+export const db = new Proxy({} as Db, {
+  get(_target, prop) {
+    const real = getDb();
+    const value = Reflect.get(real, prop, real);
+    return typeof value === "function" ? value.bind(real) : value;
+  },
+});
 
 export { schema };

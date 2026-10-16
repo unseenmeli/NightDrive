@@ -1,0 +1,86 @@
+name: Deploy staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# Never cancel a deploy halfway (e.g. mid-migration); queue the next one instead.
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to staging
+    needs: ci
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://${{ vars.STAGING_DOMAIN }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm install --global vercel@61
+
+      # Migrations run before the new code goes live, so they must stay
+      # compatible with the currently deployed version (add columns, don't drop/rename).
+      - name: Migrate staging database
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Seed staging database
+        run: npm run db:seed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ADMIN_EMAIL: ${{ vars.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+      # Staging is a Vercel *preview* deployment built with the env vars scoped to `develop`.
+      - name: Pull Vercel settings for develop previews
+        run: vercel pull --yes --environment=preview --git-branch=develop --token="$VERCEL_TOKEN"
+
+      - name: Build
+        run: vercel build --token="$VERCEL_TOKEN"
+
+      - name: Deploy
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed to $url"
+
+      # Give the new deployment the stable staging address.
+      - name: Point staging alias at the new deployment
+        run: vercel alias set "${{ steps.deploy.outputs.url }}" "${{ vars.STAGING_DOMAIN }}" --token="$VERCEL_TOKEN"
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Smoke tests
+        run: npm run test:smoke
+        env:
+          BASE_URL: https://${{ vars.STAGING_DOMAIN }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: staging-smoke-report
+          path: playwright-report/
+          retention-days: 7
