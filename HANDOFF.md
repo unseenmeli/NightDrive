@@ -53,7 +53,7 @@ Best for: coupes, mountain views, quiet drives · Notes: best at sunset or at ni
 | ORM / migrations | Drizzle ORM + drizzle-kit (SQL migrations committed to repo) |
 | Local DB | **PGlite** (embedded Postgres, no Docker needed) when `DATABASE_URL` is unset |
 | CI DB | Real Postgres 16 **service container** in GitHub Actions |
-| Maps | Leaflet + react-leaflet, OpenStreetMap / CARTO dark tiles (no API key) |
+| Maps | Leaflet + react-leaflet with Esri Dark Gray Canvas tiles (keyless; CARTO now requires an API key). Routes are snapped to roads with the public OSRM demo server (`lib/roads.ts`), falling back to straight dashed lines if it is unreachable |
 | Auth | Own implementation: email + password (Node `crypto.scrypt`), session token in httpOnly cookie, `sessions` table |
 | Validation | zod |
 | Unit tests | Vitest |
