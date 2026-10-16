@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { register } from "@/app/actions/auth";
 import { AuthForm } from "@/components/AuthForm";
+import { AuthShell } from "@/components/AuthShell";
 
 export default function RegisterPage() {
   return (
-    <main>
-      <h1>Create an account</h1>
+    <AuthShell caption="New driver" title="Create an account">
       <AuthForm
         action={register}
         submitLabel="Register"
@@ -15,9 +15,9 @@ export default function RegisterPage() {
           { name: "password", label: "Password", type: "password", autoComplete: "new-password" },
         ]}
       />
-      <p>
+      <p className="text-center text-sm text-mist">
         Already registered? <Link href="/login">Log in</Link>
       </p>
-    </main>
+    </AuthShell>
   );
 }

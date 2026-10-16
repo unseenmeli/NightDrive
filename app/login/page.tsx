@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { login } from "@/app/actions/auth";
 import { AuthForm } from "@/components/AuthForm";
+import { AuthShell } from "@/components/AuthShell";
 
 export default function LoginPage() {
   return (
-    <main>
-      <h1>Log in</h1>
+    <AuthShell caption="Driver access" title="Log in">
       <AuthForm
         action={login}
         submitLabel="Log in"
@@ -14,9 +14,9 @@ export default function LoginPage() {
           { name: "password", label: "Password", type: "password", autoComplete: "current-password" },
         ]}
       />
-      <p>
+      <p className="text-center text-sm text-mist">
         No account? <Link href="/register">Register</Link>
       </p>
-    </main>
+    </AuthShell>
   );
 }

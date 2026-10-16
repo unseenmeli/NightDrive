@@ -1,1 +1,189 @@
 @import "tailwindcss";
+
+@theme inline {
+  --font-display: var(--font-audiowide), system-ui, sans-serif;
+  --font-sans: var(--font-exo), system-ui, sans-serif;
+  --font-mono: var(--font-share-tech), ui-monospace, monospace;
+
+  --color-night: #04050c;
+  --color-asphalt: #0b0e1c;
+  --color-panel: #0d1124;
+  --color-line: #1f2a4a;
+  --color-mist: #8b97bd;
+  --color-fog: #c9d2ee;
+  --color-neon: #3ef0ff;
+  --color-violet: #b45cff;
+  --color-sodium: #ffad42;
+  --color-go: #5dff9e;
+  --color-stop: #ff4d7a;
+}
+
+/* ---------- Base ---------- */
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply min-h-dvh bg-night font-sans text-fog antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgb(180 92 255 / 0.22), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 110%, rgb(255 173 66 / 0.12), transparent 70%),
+      radial-gradient(ellipse 50% 35% at 0% 100%, rgb(62 240 255 / 0.1), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  /* CRT scanlines + film grain over everything, never blocking clicks */
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+  body::before {
+    background: repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px);
+  }
+  body::after {
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    @apply bg-violet/60 text-white;
+  }
+
+  a {
+    @apply text-neon transition-colors hover:text-white;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-wide text-white;
+  }
+
+  input:not([type="hidden"]),
+  select,
+  textarea {
+    @apply w-full rounded-sm border border-line bg-asphalt/80 px-3 py-2 font-mono text-sm text-white
+      placeholder:text-mist/60 transition outline-none
+      focus:border-neon focus:shadow-[0_0_0_1px_var(--color-neon),0_0_18px_-4px_var(--color-neon)];
+  }
+
+  select {
+    @apply cursor-pointer;
+  }
+
+  label {
+    @apply font-mono text-xs tracking-[0.18em] text-mist uppercase;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-neon);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Components ---------- */
+
+@layer components {
+  /* Y2K chrome lettering */
+  .chrome {
+    background: linear-gradient(180deg, #ffffff 0%, #dfe6ff 38%, #6b7aa6 50%, #1c2340 54%, #8fa0d6 78%, #f2f5ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    position: relative;
+  }
+  /* Violet glow behind the lettering (a filter here would paint a visible box) */
+  .chrome::before {
+    content: "";
+    position: absolute;
+    inset: 15% -4%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(180 92 255 / 0.35), transparent);
+    filter: blur(18px);
+    pointer-events: none;
+  }
+
+  /* Game-menu panel with clipped corners */
+  .panel {
+    @apply relative border border-line bg-panel/75 backdrop-blur-sm;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), inset 0 0 40px rgb(62 240 255 / 0.04);
+  }
+
+  /* Small "// LABEL" HUD captions */
+  .hud {
+    @apply font-mono text-[0.7rem] tracking-[0.25em] text-neon/80 uppercase;
+  }
+  .hud::before {
+    content: "// ";
+    @apply text-violet;
+  }
+
+  /* Glossy 2000s gel button */
+  .btn {
+    @apply relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-sm px-5 py-2
+      font-display text-xs tracking-[0.2em] text-night uppercase italic transition
+      disabled:cursor-wait disabled:opacity-60;
+    background: linear-gradient(180deg, #b6fbff 0%, var(--color-neon) 48%, #0fb8cc 52%, #36e4f5 100%);
+    box-shadow: 0 0 0 1px rgb(62 240 255 / 0.5), 0 0 22px -4px var(--color-neon), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+  .btn:hover:not(:disabled) {
+    @apply brightness-110;
+    box-shadow: 0 0 0 1px var(--color-neon), 0 0 32px -2px var(--color-neon), inset 0 1px 0 rgb(255 255 255 / 0.8);
+  }
+  .btn-ghost {
+    @apply text-fog;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02));
+    box-shadow: 0 0 0 1px var(--color-line), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    @apply text-white;
+    box-shadow: 0 0 0 1px var(--color-violet), 0 0 20px -6px var(--color-violet);
+  }
+  .btn-danger {
+    @apply text-white;
+    background: linear-gradient(180deg, #ff9db5 0%, var(--color-stop) 48%, #c81f4c 52%, #f0466f 100%);
+    box-shadow: 0 0 0 1px rgb(255 77 122 / 0.5), 0 0 22px -6px var(--color-stop), inset 0 1px 0 rgb(255 255 255 / 0.5);
+  }
+  .btn-go {
+    background: linear-gradient(180deg, #d2ffe3 0%, var(--color-go) 48%, #1fcf68 52%, #52f593 100%);
+    box-shadow: 0 0 0 1px rgb(93 255 158 / 0.5), 0 0 22px -6px var(--color-go), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 border px-2 py-0.5 font-mono text-[0.68rem] tracking-[0.15em] uppercase;
+  }
+  .chip-easy,
+  .chip-approved {
+    @apply border-go/40 bg-go/10 text-go;
+  }
+  .chip-moderate,
+  .chip-pending {
+    @apply border-sodium/40 bg-sodium/10 text-sodium;
+  }
+  .chip-challenging,
+  .chip-rejected {
+    @apply border-stop/40 bg-stop/10 text-stop;
+  }
+  .chip-tag {
+    @apply border-violet/40 bg-violet/10 text-violet;
+  }
+
+  .error {
+    @apply mt-1 block font-mono text-xs text-stop;
+  }
+  .error::before {
+    content: "! ";
+  }
+
+  /* Neon route line */
+  .route-glow {
+    filter: drop-shadow(0 0 3px var(--color-neon)) drop-shadow(0 0 10px rgb(62 240 255 / 0.6));
+  }
+}
